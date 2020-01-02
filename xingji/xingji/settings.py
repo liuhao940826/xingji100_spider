@@ -42,11 +42,11 @@ HTTPERROR_ALLOWED_CODES = [400, 403, 404, 587, 588, 589]
 CLOSESPIDER_TIMEOUT = 82800
 
 # mysql
-MYSQL_HOST = 'xxxxxxxxxx'
+MYSQL_HOST = 'localhost'
 MYSQL_PORT = 3306
-MYSQL_DB = 'xxxxxxxxx'
-MYSQL_USER = 'xxxx'
-MYSQL_PASSWD = 'xxxx'
+MYSQL_DB = 'fall_in_love'
+MYSQL_USER = 'root'
+MYSQL_PASSWD = 'root'
 CHARSET = 'utf8mb4'
 
 # mongo

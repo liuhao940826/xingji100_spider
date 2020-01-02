@@ -1,0 +1,40 @@
+CREATE TABLE `xj_anchor_category` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `unknow1` varchar(255) DEFAULT NULL,
+  `unknow2` int(11) DEFAULT NULL,
+  `unknow3` int(11) DEFAULT NULL,
+  `add_time` int(11) DEFAULT NULL,
+  `update_time` int(11) DEFAULT NULL,
+  `unknow4` tinyint(4) DEFAULT NULL,
+  `unknow5` tinyint(4) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+CREATE TABLE `xj_star` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `category_id` varchar(255) DEFAULT NULL,
+  `platform_id` varchar(255) DEFAULT NULL,
+  `unknow1` varchar(255) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `avatar` text,
+  `live_url` text,
+  `unknow2` varchar(255) DEFAULT NULL,
+  `unknow3` varchar(255) DEFAULT NULL,
+  `unknow4` varchar(255) DEFAULT NULL,
+  `unknow5` varchar(255) DEFAULT NULL,
+  `unknow6` varchar(255) DEFAULT NULL,
+  `unknow7` varchar(255) DEFAULT NULL,
+  `unknow8` varchar(255) DEFAULT NULL,
+  `view_num` varchar(255) DEFAULT NULL,
+  `add_time` int(11) DEFAULT NULL,
+  `update_time` int(11) DEFAULT NULL,
+  `is_publish` tinyint(4) DEFAULT NULL,
+  `unknow9` varchar(255) DEFAULT NULL,
+  `unknow10` varchar(255) DEFAULT NULL,
+  `unknow11` int(11) DEFAULT NULL,
+  `unknow12` decimal(2,0) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
