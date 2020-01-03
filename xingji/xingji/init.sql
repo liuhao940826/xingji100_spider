@@ -38,3 +38,12 @@ CREATE TABLE `xj_star` (
   `unknow12` decimal(2,0) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `xj_anchor_live` (
+  `id` bigint(12) NOT NULL COMMENT '主键',
+  `anchor_id` bigint(20) DEFAULT NULL COMMENT '主播id',
+  `data` varchar(32) DEFAULT NULL COMMENT '直播日期',
+  `start_time` int(11) DEFAULT NULL COMMENT '直播开始时间',
+  `end_time` int(11) DEFAULT NULL COMMENT '直播结束时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
