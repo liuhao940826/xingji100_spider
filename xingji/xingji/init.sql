@@ -47,3 +47,14 @@ CREATE TABLE `xj_anchor_live` (
   `end_time` int(11) DEFAULT NULL COMMENT '直播结束时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `xj_gift_value` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `gift_id` bigint(11) DEFAULT NULL COMMENT '礼物id',
+  `name` varchar(20) DEFAULT NULL COMMENT '礼物名',
+  `platform_id` bigint(20) DEFAULT NULL COMMENT '平台id',
+  `price` decimal(18,2) DEFAULT NULL COMMENT '礼物单价',
+  `add_time` int(11) DEFAULT NULL COMMENT '添加时间',
+  `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
