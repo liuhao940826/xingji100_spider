@@ -17,11 +17,11 @@ class XjUpdateGamesSpider(scrapy.Spider):
     }
     start_urls = [
         'http://open.douyucdn.cn/api/RoomApi/game',
-        'http://www.quanmin.tv/category/',
+        # 'http://www.quanmin.tv/category/',
         'http://www.huya.com/g',
         'http://longzhu.com/games/',
         'http://egame.qq.com/gamelist/',
-        'https://www.panda.tv/cate',
+        # 'https://www.panda.tv/cate',
         'http://www.zhanqi.tv/games',
         'http://api.vc.bilibili.com/room/v1/area/getRoomList?parent_area_id=2&cate_id=0&area_id=0&sort_type=online&page=1&page_size=30',
         'https://www.huomao.com/game',
@@ -37,11 +37,11 @@ class XjUpdateGamesSpider(scrapy.Spider):
                     callback=self.douyu_parse,
                     meta={"url": url}
                 )
-            if url.find('quanmin') > 0:
-                yield scrapy.Request(
-                    url,
-                    callback=self.quanmin_parse,
-                )
+            # if url.find('quanmin') > 0:
+            #     yield scrapy.Request(
+            #         url,
+            #         callback=self.quanmin_parse,
+            #     )
             if url.find('huya') > 0:
                 yield scrapy.Request(
                     url,
@@ -57,11 +57,11 @@ class XjUpdateGamesSpider(scrapy.Spider):
                     url,
                     callback=self.egame_parse,
                 )
-            if url.find('panda') > 0:
-                yield scrapy.Request(
-                    url,
-                    callback=self.panda_parse,
-                )
+            # if url.find('panda') > 0:
+            #     yield scrapy.Request(
+            #         url,
+            #         callback=self.panda_parse,
+            #     )
             if url.find('zhanqi') > 0:
                 yield scrapy.Request(
                     url,
@@ -80,6 +80,7 @@ class XjUpdateGamesSpider(scrapy.Spider):
                 )
 
     def douyu_parse(self, response):
+        logging.info("斗鱼callback,被调用")
         if deal_status(response):
             return
         info_dict = json.loads(response.body.decode())
@@ -90,6 +91,7 @@ class XjUpdateGamesSpider(scrapy.Spider):
                 yield item
 
     def quanmin_parse(self, response):
+        logging.info("全民,被调用")
         if deal_status(response):
             return
         a_list = response.xpath("//div[@class='list_w-card_wrap']/a")
