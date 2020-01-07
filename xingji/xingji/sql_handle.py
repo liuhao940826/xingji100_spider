@@ -28,6 +28,11 @@ class Sqlhandle(object):
         :return:game_id
         '''
         sql = "SELECT id FROM xj_anchor_category WHERE name=%s"
+
+        if game is None:
+            logging.error("select_game_id 中的 game的名字为None")
+            return None
+
         # 返回符合查询结果的数量
         if self.cursor.execute(sql, game) > 0:
             category_id = self.cursor.fetchone()[0]
