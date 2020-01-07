@@ -12,6 +12,7 @@ from copy import deepcopy
 import json
 from ..items import Xj_starItem
 from ..tools import *
+import logging
 
 
 class XjStarSpider(scrapy.Spider):
@@ -23,11 +24,11 @@ class XjStarSpider(scrapy.Spider):
     }
     start_urls = [
         'http://www.douyu.com/directory',
-        'http://www.quanmin.tv/category/',
+        #'http://www.quanmin.tv/category/',
         'http://www.huya.com/g',
         'http://longzhu.com/games/',
         'http://egame.qq.com/gamelist/',
-        'https://www.panda.tv/cate',
+        #'https://www.panda.tv/cate',
         'http://www.zhanqi.tv/games',
         'http://api.vc.bilibili.com/room/v1/area/getRoomList?parent_area_id=2&cate_id=0&area_id=0&sort_type=online&page=1&page_size=30',
         'https://www.huomao.com/channels/channel.json?page=1&game_url_rule=all',
@@ -111,10 +112,14 @@ class XjStarSpider(scrapy.Spider):
         if deal_status(response):
             return
         url = response.meta["url"]
+        logging.error("斗鱼的xj_star的url:{}".format(url))
         # 一级分类url参数列表
         nav_list = ["djry?isAjax=1", "syxx?isAjax=1",  "PCgame?isAjax=1"]
         for nav in nav_list:
             full_url = url + '/index/' + nav
+
+            logging.error("斗鱼的xj_star的full_url:{}".format(full_url))
+
             yield scrapy.Request(
                 full_url,
                 # 蚂蚁请求头
