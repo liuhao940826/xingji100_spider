@@ -110,7 +110,7 @@ class XjGiftValueSpider(scrapy.Spider):
                     # errback=self.errback_handle,
                 )
 
-    def quanmin_parse(self, response):
+    def Xj_starPipelinequanmin_parse(self, response):
         if deal_status(response):
             return
         info_dict = json.loads(response.body.decode())

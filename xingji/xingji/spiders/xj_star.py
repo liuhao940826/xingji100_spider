@@ -2,14 +2,10 @@
 # 该爬虫抓取各平台主播基本信息，入库条件为在线热度大于2w，图片保存在settings.py配置的图片路径中
 # 斗鱼存在被ban情况，需要使用代理
 import scrapy
-import re
 import math
 import urllib.parse
 from ..sql_handle import *
-import logging
-import time
 from copy import deepcopy
-import json
 from ..items import Xj_starItem
 from ..tools import *
 import logging
@@ -53,7 +49,7 @@ class XjStarSpider(scrapy.Spider):
                     url,
                     # 蚂蚁请求头
                     # headers=generate_sign(),
-                    callback=self.douyu_fir_list,
+                    callback=self.douyu_get_cate_room,
                     meta={"url": url},
                     # errback=self.errback_handle,
                 )
@@ -103,66 +99,137 @@ class XjStarSpider(scrapy.Spider):
                 )
 
     # ------------斗鱼------------
-    def douyu_fir_list(self, response):
-        '''
-        获取一级游戏分类列表页，挑选游戏分类
-        :param response:
-        :return:
-        '''
-        if deal_status(response):
-            return
-        url = response.meta["url"]
-        logging.error("斗鱼的xj_star的url:{}".format(url))
-        # 一级分类url参数列表
-        nav_list = ["djry?isAjax=1", "syxx?isAjax=1",  "PCgame?isAjax=1"]
-        for nav in nav_list:
-            full_url = url + '/index/' + nav
+    # def douyu_fir_list(self, response):
+    #     '''
+    #     获取一级游戏分类列表页，挑选游戏分类
+    #     :param response:
+    #     :return:
+    #     '''
+    #     if deal_status(response):
+    #         return
+    #     url = response.meta["url"]
+    #     logging.error("斗鱼的xj_star的url:{}".format(url))
+    #     # 一级分类url参数列表
+    #     # nav_list = ["djry?isAjax=1", "syxx?isAjax=1",  "PCgame?isAjax=1"]
+    #     hrefs = response.css('.Aside-menu-whole::attr(href)').extract()
+    #
+    #     logging.error("抓取斗鱼的分类中a的href:{}".format(hrefs))
+    #
+    #     logging.error('url的类型:{}'.format(type(url)))
+    #
+    #     for nav in hrefs:
+    #         # full_url = url + '/index/' + nav
+    #         index = str(url).rindex('/')
+    #         logging.info("/在url中的坐标:{}".format(index))
+    #         pre_url = url[0:index]
+    #         logging.error("截取后的url地址:{}".format(pre_url))
+    #         full_url=pre_url+nav
+    #         logging.error("斗鱼的xj_star的full_url:{}".format(full_url))
+    #         yield scrapy.Request(
+    #             full_url,
+    #             # 蚂蚁请求头
+    #             # headers=generate_sign(),
+    #             callback=self.douyu_get_cate_room,
+    #             # errback=self.errback_handle,
+    #         )
 
-            logging.error("斗鱼的xj_star的full_url:{}".format(full_url))
+    # def douyu_sec_list(self, response):
+    #     '''
+    #     获取二级游戏分类列表页,查询xj_anchor_category获得游戏分类id,若无id则添加
+    #     category_id为xj_anchor_category中游戏分类id
+    #     cate_id为斗鱼官方游戏分类id
+    #     :param response:
+    #     :return:
+    #     '''
+    #     if deal_status(response):
+    #         return
+    #     a_list = response.xpath("//li/a")
+    #     for a in a_list:
+    #         game = a.xpath("./p/text()").extract_first()
+    #         # 获取category_id作为xj_star字段
+    #         # category_id = self.sql.deal_game(game, self.douyu_id)
+    #         category_id = self.sql.select_game_id(game)
+    #         if category_id is None:
+    #             data = "spider:{} 游戏分类库中没有该游戏分类!!!暂时将游戏分类设为默认值''. 游戏名:{} 平台id:{} time:{}".format(self.name, game, self.douyu_id, time_str())
+    #             logging.error(data)
+    #             category_id = ''
+    #         # 请求斗鱼所有游戏分类接口
+    #         game_api = "http://open.douyucdn.cn/api/RoomApi/game"
+    #         # time.sleep(0.4)
+    #         yield scrapy.Request(
+    #             game_api,
+    #             # 蚂蚁请求头
+    #             # headers=generate_sign(),
+    #             dont_filter=True,
+    #             callback=self.douyu_get_cate,
+    #             # errback=self.errback_handle,
+    #             meta={
+    #                 "category_id": deepcopy(category_id),
+    #                 "game": deepcopy(game)
+    #             }
+    #         )
+    '''
+        斗鱼直播全部分类 不区分游戏还是其他的
+    '''
+    def douyu_get_cate_room(self, response):
+        page = 0
+        while True:
+            page += 1
+            print(
+                '-------------------------第%s页-----------------------------------------------------------------------------------------' % page)
+            url = 'https://www.douyu.com/gapi/rkc/directory/0_0/%s' % page
+            headers = {
+                'user-agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36'
+            }
+            response = requests.get(url=url, headers=headers)
+            # with open('templates\\douyu1.txt', 'w', encoding='utf-8') as fp:
+            #     fp.write(response.content.decode('utf-8'))
+            data_list = response.json()['data']['rl']
+            pgcnt = response.json()['data']['pgcnt']
 
-            yield scrapy.Request(
-                full_url,
-                # 蚂蚁请求头
-                # headers=generate_sign(),
-                callback=self.douyu_sec_list,
-                # errback=self.errback_handle,
-            )
+            logging.error("pgcnt的类型:{}".format(type(pgcnt)))
+            logging.error("当前页:{},总页数:{}".format(page, pgcnt))
 
-    def douyu_sec_list(self, response):
-        '''
-        获取二级游戏分类列表页,查询xj_anchor_category获得游戏分类id,若无id则添加
-        category_id为xj_anchor_category中游戏分类id
-        cate_id为斗鱼官方游戏分类id
-        :param response:
-        :return:
-        '''
-        if deal_status(response):
-            return
-        a_list = response.xpath("//li/a")
-        for a in a_list:
-            game = a.xpath("./p/text()").extract_first()
-            # 获取category_id作为xj_star字段
-            # category_id = self.sql.deal_game(game, self.douyu_id)
-            category_id = self.sql.select_game_id(game)
-            if category_id is None:
-                data = "spider:{} 游戏分类库中没有该游戏分类!!!暂时将游戏分类设为默认值''. 游戏名:{} 平台id:{} time:{}".format(self.name, game, self.douyu_id, time_str())
-                logging.error(data)
-                category_id = ''
-            # 请求斗鱼所有游戏分类接口
-            game_api = "http://open.douyucdn.cn/api/RoomApi/game"
-            # time.sleep(0.4)
-            yield scrapy.Request(
-                game_api,
-                # 蚂蚁请求头
-                # headers=generate_sign(),
-                dont_filter=True,
-                callback=self.douyu_get_cate,
-                # errback=self.errback_handle,
-                meta={
-                    "category_id": deepcopy(category_id),
-                    "game": deepcopy(game)
-                }
-            )
+            if page >=pgcnt:
+                break
+
+            logging.error("该页共查询到:{}个房间".format(len(data_list)))
+            i = 0
+            for data in data_list:
+                i += 1
+                logging.error("第{}s个房间++++++++++++++++++++++++++++++++++++++++" .format(i))
+                room_name = data['rn']
+                room_tag = data['c2name']
+                room_player = data['nn']
+                room_follows = data['ol']
+                room_id =data['rid']
+                #分类的名字 斗鱼用的是code
+                cate_name = data['c2name']
+                avatar = 'https://apic.douyucdn.cn/upload'+data['av']
+
+
+                logging.error("房间名称：{}".format(room_name))
+                logging.error("主播{}".format(room_player))
+                logging.error("房间标签：{}".format(room_tag))
+                logging.error("关注数{}".format(room_follows))
+                logging.error("房间号:{}".format(room_id))
+                logging.error("头像:{}".format(avatar))
+                logging.error("分类:{}".format(cate_name))
+                #构建对象
+                item = Xj_starItem()
+                item["platform_id"] = self.douyu_id
+                # item["category_id"] = response.meta["category_id"]
+                item["name"] = response.meta["name"]
+                item["view_num"] = response.meta["view_num"]
+                item["live_url"] = response.meta["live_url"]
+                avatar_url = response.xpath(
+                    "//div[@id='anchor-info']/div[@class='anchor-pic fl']/img/@src").extract_first()
+                item["avatar"] = get_avatar(avatar_url, "douyu")
+
+
+
+
+
 
     def douyu_get_cate(self, response):
         '''
@@ -438,6 +505,10 @@ class XjStarSpider(scrapy.Spider):
             # 获取虎牙官方游戏分类id
             gid = li.xpath("./@gid").extract_first()
             # category_id = self.sql.deal_game(game, self.huya_id)
+            logging.error("游戏分类中game的名字:{}".format(game))
+            if game is None:
+                logging.error("游戏分类列表页的response:{}".format(response))
+                continue
             category_id = self.sql.select_game_id(game)
             if category_id is None:
                 data = "spider:{} 游戏分类库中没有该游戏分类!!!暂时将游戏分类设为默认值''. 游戏名:{} 平台id:{} time:{}".format(self.name, game, self.huya_id, time_str())
@@ -966,3 +1037,4 @@ class XjStarSpider(scrapy.Spider):
         '''
         logging.critical(repr(failure))
         pass
+
